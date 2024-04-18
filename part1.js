@@ -1,4 +1,3 @@
-console.log("extension")
 
 // document.querySelectorAll(".LC20lb").forEach(e=>{
 //     e.style.border = "thick solid #0000FF"
@@ -9,7 +8,6 @@ let links = []
 let pointer = -1
 
 function addElm(elm){
-    console.log("node added")
     links.push(elm)
 
     if(links.length == 1){
@@ -31,7 +29,6 @@ function clamp_pointer_into_view(){
         document.documentElement.scrollTop += elm.top - margin 
     } 
     if(elm.bot > window.innerHeight){
-        console.log("bot");
         document.documentElement.scrollTop += elm.bot - window.innerHeight + margin
     }
 }
