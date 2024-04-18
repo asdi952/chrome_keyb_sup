@@ -8,6 +8,7 @@ let links = []
 let pointer = -1
 
 function addElm(elm){
+    console.log("addded")
     links.push(elm)
 
     if(links.length == 1){
@@ -60,12 +61,18 @@ function enter_link(){
 
     a.click()
 }
+function lose_focus(){
+    document.body.click()
+    document.activeElement.blur()
+}
+document.addEventListener("load",()=>{
+    lose_focus()
+})
 
 document.addEventListener("keydown", (evt)=>{
     // console.log(evt)
     if(evt.key === 'Escape'){
-        document.body.click()
-        document.activeElement.blur()
+        lose_focus
     }
 
     if( document.activeElement.tagName !== "BODY") {return}
@@ -85,23 +92,68 @@ document.addEventListener("keydown", (evt)=>{
 
 })
 
-const root_selector = "#rso"
-const elm_selector = ["MjjYud", "g"]
 
-const o = new MutationObserver(mutationList =>{
-    for (const mutation of mutationList) {
-        if (mutation.type === "childList") {
-            mutation.addedNodes.forEach(node=>{
-                if(node == undefined) {return}
-                if(node.classList == undefined) {return}
-                
-                if(node.classList.contains(elm_selector[1])){
-                    if(node.parentNode.classList.contains(elm_selector[0])){
-                        addElm(node.parentNode)
+function watch_elm_added(root, id, callback){
+    const o = new MutationObserver((records, self) =>{
+        for (const record of records) {
+            if(record.target.id == id) {
+                if(record.addedNodes.length != 0){
+                    for( const node of record.addedNodes){
+                        if(node.tagName == "DIV"){
+                            // console.log(node)
+                            callback(node)
+                        }
                     }
                 }
-            })
+                
+                // console.log(record.target.id, record.type)
+            }
         }
+    })
+    
+    o.observe(  root, { childList: true, subtree: true})
+    
+}
+
+watch_elm_added(document, "tads", (node)=>{
+    addElm(node)
+})
+
+watch_elm_added(document, "rso", (node)=>{
+    addElm(node)
+})
+
+
+function watch_elm_added1(root, regex, callback){
+    const o = new MutationObserver((records, self) =>{
+        for (const record of records) {
+            const match = record.target.id.match(regex)
+            console.log(match);
+            if(match == undefined) break
+            if(match.groups == undefined) break
+            if(match.groups[num] < 100) break
+
+            if(record.addedNodes.length != 0){
+                for( const node of record.addedNodes){
+                    if(node.tagName == "DIV"){
+                        // console.log(node)
+                        callback(node)
+                    }
+                }
+            }
+        }
+    })
+    
+    o.observe(  root, { childList: true, subtree: true})
+    
+}
+
+watch_elm_added1(document, /"arc-srp_(?<num>\d+)/, (node)=>{
+    // addElm(node)
+    console.log(node);
+    for(let child of node.childNodes){
+        if(child.tagName !== "DIV") continue
+  
+        addElm(child)
     }
 })
-o.observe( document, { childList: true, subtree: true})
